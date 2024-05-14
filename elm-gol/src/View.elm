@@ -86,14 +86,14 @@ styleSheet =
         gridColumnSettings =
             Board.size
                 |> Tuple.first
-                |> (\x -> List.repeat x "5px")
+                |> (\x -> List.repeat x "7px")
                 |> String.join " "
     in
     """
     body {
         margin: 0;
         padding: 0;
-        background-color: #999;
+        background-color: #333;
     }
 
     .grid-container {
@@ -102,9 +102,9 @@ styleSheet =
     }
 
     .grid-container > div {
-        height: 5px;
-        width: 5px;
-        border: 0px solid #444;
+        height: 7px;
+        width: 7px;
+        border: 1px solid #111;
         background-color: #000;
     }
 

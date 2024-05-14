@@ -18,7 +18,7 @@ init =
 
 size : ( Int, Int )
 size =
-    ( 350, 200 )
+    ( 200, 90 )
 
 
 next : Board -> Board

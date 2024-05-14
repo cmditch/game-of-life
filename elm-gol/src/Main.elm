@@ -6,6 +6,7 @@ import Browser.Events
 import Json.Decode as Decode
 import Model exposing (Model)
 import Shapes exposing (Shape(..))
+import Time
 import Update exposing (Msg(..))
 import View
 
@@ -30,6 +31,8 @@ main =
                 Sub.batch
                     [ Browser.Events.onMouseDown (Decode.succeed <| SetDrawing True)
                     , Browser.Events.onMouseUp (Decode.succeed <| SetDrawing False)
-                    , Browser.Events.onAnimationFrame (always Tick)
+
+                    -- , Browser.Events.onAnimationFrame (always Tick)
+                    , Time.every 200 (always Tick)
                     ]
         }
