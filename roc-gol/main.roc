@@ -25,8 +25,8 @@ main =
 
 gameLoop : ScreenInfo, Board -> Task.Task _ _
 gameLoop = \screenInfo, board ->
-    drawBoard! screenInfo board
-    # Sleep.millis! 100
+    drawBoard! board
+    Sleep.millis! 200
     boardSize = { width: Num.toU64 screenInfo.screen.width, height: Num.toU64 screenInfo.screen.height }
     nextBoard = next boardSize board
     Task.ok (Step nextBoard)
@@ -87,6 +87,15 @@ pulsar = [
     { x: 10, y: 12 },
 ]
 
+glider : List RelativeCoord
+glider = [
+    { x: 1, y: 0 },
+    { x: 2, y: 1 },
+    { x: 0, y: 2 },
+    { x: 1, y: 2 },
+    { x: 2, y: 2 },
+]
+
 Board : List (List Bool)
 BoardSize : { width : U64, height : U64 }
 Coord : { x : U64, y : U64 }
@@ -96,8 +105,11 @@ init : BoardSize -> Board
 init = \boardSize ->
     row = List.repeat Bool.false boardSize.width
     board = List.repeat row boardSize.height
-    wat = add { x: 10, y: 10 } pulsar
-    mark board wat
+    withPulsar = add { x: 15, y: 15 } pulsar
+    withGlider = add { x: 30, y: 30 } glider
+    board
+    |> mark withPulsar
+    |> mark withGlider
 
 next : BoardSize, Board -> Board
 next = \boardSize, board ->
@@ -207,22 +219,15 @@ setTerminalBuffer = \enable ->
     else
         Stdout.write! "\u(001b)[?1049l"
 
-drawBoard : ScreenInfo, Board -> Task.Task _ _
-drawBoard = \screenInfo, board ->
-    Core.drawScreen screenInfo (drawBoardHelp board)
-        |> Stdout.write!
-
-drawBoardHelp : Board -> List Core.DrawFn
-drawBoardHelp = \board ->
-    List.mapWithIndex
+drawBoard : Board -> Task.Task _ _
+drawBoard = \board ->
+    # Reset screen
+    Stdout.write! "\u(001b)[2J"
+    List.map
         board
-        (\row, rowNum ->
-            List.mapWithIndex
-                row
-                (\cellState, colNum ->
-                    Core.drawText
-                        (if cellState then "*" else " ")
-                        { r: Num.toI32 rowNum, c: Num.toI32 colNum }
-                )
+        (\row ->
+            List.map row (\cellState -> (if cellState then "█" else " "))
+            |> Str.joinWith ""
         )
-    |> List.join
+        |> Str.joinWith "\n"
+        |> Stdout.write!
